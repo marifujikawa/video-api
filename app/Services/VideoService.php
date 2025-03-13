@@ -27,11 +27,10 @@ class VideoService implements VideoServiceInterface
             throw new VideoNotFoundException("Video with ID {$id} not found");
         }
 
-        $this->repository->incrementField($video, 'views');
         return $video;
     }
 
-    public function updateVideo(int $id, array $data): Video
+    public function incrementField(int $id, string $field): Video
     {
         $video = $this->repository->findById($id);
         
@@ -39,17 +38,6 @@ class VideoService implements VideoServiceInterface
             throw new VideoNotFoundException("Video with ID {$id} not found");
         }
 
-        return $this->repository->update($video, $data);
-    }
-
-    public function incrementLikes(int $id): Video
-    {
-        $video = $this->repository->findById($id);
-        
-        if (!$video) {
-            throw new VideoNotFoundException("Video with ID {$id} not found");
-        }
-
-        return $this->repository->incrementField($video, 'likes');
+        return $this->repository->incrementField($video, $field);
     }
 }

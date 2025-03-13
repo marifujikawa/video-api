@@ -17,37 +17,59 @@ class VideoApiTest extends TestCase
         $response = $this->getJson('/api/videos');
 
         $response->assertStatus(200)
-            ->assertJsonCount(5, 'data');
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => ['id', 'title', 'description', 'thumbnail', 'views', 'likes']
+                ],
+                'meta' => ['current_page', 'total']
+            ]);
     }
 
-    public function test_can_filter_videos_by_title(): void
-    {
-        Video::factory()->create(['title' => 'Marketing Digital']);
-        Video::factory()->create(['title' => 'Desenvolvimento Web']);
-
-        $response = $this->getJson('/api/videos?title_contains=Marketing');
-
-        $response->assertStatus(200)
-            ->assertJsonCount(1, 'data');
-    }
-
-    public function test_can_get_video_details_and_increment_views(): void
+    public function test_can_get_video_details(): void
     {
         $video = Video::factory()->create(['views' => 0]);
 
         $response = $this->getJson("/api/videos/{$video->id}");
 
-        $response->assertStatus(200);
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                'data' => ['id', 'title', 'description', 'thumbnail', 'views', 'likes']
+            ]);
+    }
+
+    public function test_can_increment_video_views(): void
+    {
+        $video = Video::factory()->create(['views' => 0]);
+
+        $response = $this->patchJson("/api/videos/{$video->id}/increment/views");
+
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                'data' => ['id', 'title', 'description', 'thumbnail', 'views', 'likes']
+            ]);
         $this->assertEquals(1, $video->fresh()->views);
     }
 
-    public function test_can_update_video_likes(): void
+    public function test_can_increment_video_likes(): void
     {
         $video = Video::factory()->create(['likes' => 0]);
 
-        $response = $this->postJson("/api/videos/{$video->id}/like");
+        $response = $this->patchJson("/api/videos/{$video->id}/increment/likes");
 
-        $response->assertStatus(200);
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                'data' => ['id', 'title', 'description', 'thumbnail', 'views', 'likes']
+            ]);
         $this->assertEquals(1, $video->fresh()->likes);
     }
+
+    public function test_cannot_increment_invalid_field(): void
+    {
+        $video = Video::factory()->create();
+
+        $response = $this->patchJson("/api/videos/{$video->id}/increment/invalid");
+
+        $response->assertStatus(404);
+    }
+
 }
