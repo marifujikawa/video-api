@@ -2,12 +2,12 @@
 
 namespace App\Services\Interfaces;
 
-use Illuminate\Pagination\LengthAwarePaginator;
 use App\Models\Video;
+use Illuminate\Database\Eloquent\Collection;
 
 interface VideoServiceInterface
 {
-    public function listVideos(array $filters, array $pagination): LengthAwarePaginator;
+    public function listVideos(): Collection;
     public function getVideo(int $id): Video;
     public function incrementField(int $id, string $field): Video;
 }

@@ -3,36 +3,15 @@
 namespace App\Repositories;
 
 use App\Models\Video;
-use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
 
 class VideoRepository implements VideoRepositoryInterface
 {
-    public function findWithFilters(array $filters, array $pagination): LengthAwarePaginator
+    public function find(): Collection
     {
-        $cacheKey = 'videos:' . md5(json_encode($filters) . json_encode($pagination));
-        
-        return Cache::remember($cacheKey, 60 * 5, function () use ($filters, $pagination) {
-            $query = Video::query();
-
-            if (isset($filters['title_contains'])) {
-                $query->where('title', 'like', '%' . $filters['title_contains'] . '%');
-            }
-
-            if (isset($filters['category'])) {
-                $query->where('category', $filters['category']);
-            }
-
-            if (isset($filters['sort'])) {
-                $query->orderBy($filters['sort'], $filters['order'] ?? 'desc');
-            }
-
-            return $query->paginate(
-                $pagination['per_page'] ?? 10,
-                ['*'],
-                '_page',
-                $pagination['page'] ?? 1
-            );
+        return Cache::remember('videos:all', 60 * 5, function () {
+            return Video::all();
         });
     }
 

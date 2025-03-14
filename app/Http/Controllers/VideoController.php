@@ -3,11 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ListVideoRequest;
-use App\Http\Requests\IncrementVideoRequest;
 use App\Http\Resources\VideoResource;
 use App\Services\Interfaces\VideoServiceInterface;
 use App\Exceptions\VideoNotFoundException;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
@@ -19,11 +17,7 @@ class VideoController extends Controller
 
     public function index(ListVideoRequest $request): ResourceCollection
     {
-        $videos = $this->videoService->listVideos(
-            $request->only(['title_contains', 'category', 'sort', 'order']),
-            $request->only(['_per_page', '_page'])
-        );
-
+        $videos = $this->videoService->listVideos();
         return VideoResource::collection($videos);
     }
 

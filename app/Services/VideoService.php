@@ -6,7 +6,7 @@ use App\Models\Video;
 use App\Services\Interfaces\VideoServiceInterface;
 use App\Repositories\VideoRepositoryInterface;
 use App\Exceptions\VideoNotFoundException;
-use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
 
 class VideoService implements VideoServiceInterface
 {
@@ -14,9 +14,9 @@ class VideoService implements VideoServiceInterface
         private readonly VideoRepositoryInterface $repository
     ) {}
 
-    public function listVideos(array $filters, array $pagination): LengthAwarePaginator
+    public function listVideos(): Collection
     {
-        return $this->repository->findWithFilters($filters, $pagination);
+        return $this->repository->find();
     }
 
     public function getVideo(int $id): Video

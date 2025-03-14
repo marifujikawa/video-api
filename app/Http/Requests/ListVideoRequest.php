@@ -14,12 +14,10 @@ class ListVideoRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title_contains' => 'sometimes|string|max:255',
-            'category' => 'sometimes|string|max:255',
-            '_per_page' => 'sometimes|integer|min:1|max:100',
-            '_page' => 'sometimes|integer|min:1',
-            'sort' => 'sometimes|in:title,views,likes,created_at',
-            'order' => 'sometimes|in:asc,desc'
+            'title_contains' => 'string|nullable',
+            'category' => 'string|nullable',
+            'sort' => 'string|in:title,created_at|nullable',
+            'order' => 'string|in:asc,desc|nullable',
         ];
     }
 }
