@@ -8,6 +8,8 @@ use App\Services\Interfaces\VideoServiceInterface;
 use App\Exceptions\VideoNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use App\Models\Video;
+use Illuminate\Http\Request;
 
 class VideoController extends Controller
 {
@@ -15,16 +17,34 @@ class VideoController extends Controller
         private readonly VideoServiceInterface $videoService
     ) {}
 
-    public function index(ListVideoRequest $request): ResourceCollection
+    public function index(Request $request): JsonResponse
     {
-        $videos = $this->videoService->listVideos();
-        return VideoResource::collection($videos);
+        $query = Video::query();
+
+        // Aplicar filtros
+        if ($request->has('title_contains')) {
+            $query->where('title', 'like', '%' . $request->title_contains . '%');
+        }
+
+        if ($request->has('category')) {
+            $query->where('category', $request->category);
+        }
+
+        // Aplicar paginação
+        $perPage = $request->_per_page ?? 10;
+        $page = $request->_page ?? 1;
+
+        $videos = $query->paginate($perPage, ['*'], '_page', $page);
+
+        return response()->json($videos);
     }
 
     public function show(int $id): JsonResponse
     {
         try {
             $video = $this->videoService->getVideo($id);
+            $video = $this->videoService->incrementViews($video);
+            
             return response()->json(['data' => new VideoResource($video)]);
         } catch (VideoNotFoundException $e) {
             return response()->json(['error' => $e->getMessage()], $e->getCode());

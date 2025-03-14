@@ -12,10 +12,15 @@ class Video extends Model
     protected $fillable = [
         'title',
         'description',
-        'url',
-        'thumbnail',
         'category',
         'views',
-        'likes'
+        'likes',
+        'thumbnail_url',
+        'video_url'
+    ];
+
+    protected $attributes = [
+        'views' => 0,
+        'likes' => 0
     ];
 }

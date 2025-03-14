@@ -10,4 +10,5 @@ interface VideoServiceInterface
     public function listVideos(): Collection;
     public function getVideo(int $id): Video;
     public function incrementField(int $id, string $field): Video;
+    public function incrementViews(Video $video): Video;
 }

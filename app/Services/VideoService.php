@@ -40,4 +40,9 @@ class VideoService implements VideoServiceInterface
 
         return $this->repository->incrementField($video, $field);
     }
+
+    public function incrementViews(Video $video): Video
+    {
+        return $this->repository->incrementField($video, 'views');
+    }
 }
